@@ -1,0 +1,6 @@
+N M
+# N int [3, 1000]
+# M int [1, 1e9]
+ui vi wi
+#ui vi tree N
+#wi ints N-1 [1, M]

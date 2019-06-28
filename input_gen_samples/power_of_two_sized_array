@@ -1,0 +1,5 @@
+N K
+ai
+# N int [1, 18]
+# K int [1, 2.5e8]
+# ai ints 2**N [1, K]

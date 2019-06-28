@@ -1,0 +1,15 @@
+N 
+A B C D   # int [1, N]
+S # string N [a-z]
+ai
+ui vi si
+# N int [4, 25]
+# ai ints N [1, 1e9] descending
+# ui vi ints N [1, 2]
+# si strings N % N [0-9]
+uij
+vij 
+# uij vij intss N % N [1, D]
+pi qi # permutation [1, N]
+xi # ints N [1, 1.5*N] distinct
+yi zi # connected_graph N % min(N*(N+1)/2, N+5)
