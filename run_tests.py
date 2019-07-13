@@ -29,7 +29,7 @@ def main():
         err("Program expected as argument")
 
     fname = sys.argv[1]
-    if fname[-4:] is ".cpp":
+    if fname[-4:] == ".cpp":
         fname = fname[:-4]
 
     bold("Compiling " + fname + " ...")
