@@ -12,4 +12,4 @@ vij
 # uij vij intss N % N [1, D]
 pi qi # permutation [1, N]
 xi # ints N [1, 1.5*N] distinct
-yi zi # connected_graph N % min(N*(N+1)/2, N+5)
+yi zi # connected_graph N, min(N*(N+1)/2, N+5)
