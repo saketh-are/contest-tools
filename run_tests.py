@@ -57,13 +57,21 @@ def main():
         print "Your output on {}:".format(sample)
         print my
 
-        if my == out:
+        proc = subprocess.Popen("diff tests/{}.out tests/{}.my".format(sample, sample),\
+                shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        o,e = proc.communicate()
+
+        if o.decode('ascii') == "":
             bold(sample + " passed")
-        elif [x.strip() for x in my] == [x.strip() for x in out]:
-            bold(sample + " passed (with leading or trailing whitespace)")
         else:
-            warn(sample + " failed")
-            failed.append(sample)
+            proc = subprocess.Popen("diff -b tests/{}.out tests/{}.my".format(sample, sample),\
+                    shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            o,e = proc.communicate()
+            if o.decode('ascii') == "":
+                bold(sample + " passed (ignored whitespace)")
+            else:
+                warn(sample + " failed")
+                failed.append(sample)
 
     if failed:
         print
