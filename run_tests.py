@@ -42,8 +42,14 @@ def main():
     sample_files = [f[:-3] for f in listdir("tests/") if sample_input.match(f)]
     failed = []
 
+    first_line_has_multiple_tokens = False
+
     bold("\nRunning samples...")
     for sample in sorted(sample_files):
+        first_line = open("tests/{}.in".format(sample), 'r').read().split("\n")[0]
+        if (len(first_line.strip().split(" ")) > 1):
+            first_line_has_multiple_tokens = True
+
         if run("./{} < tests/{}.in > tests/{}.my".format(fname, sample, sample)):
             err("Run-time error on " + sample)
 
@@ -82,5 +88,8 @@ def main():
     else:
         print
         bold("ALL SAMPLES OK!")
+
+    if first_line_has_multiple_tokens:
+        warn("First line of input has multiple tokens. Check their order carefully.")
 
 if __name__ == "__main__": main()
