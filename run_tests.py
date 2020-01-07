@@ -76,8 +76,33 @@ def main():
             if o.decode('ascii') == "":
                 bold(sample + " passed (ignored whitespace)")
             else:
-                warn(sample + " failed")
-                failed.append(sample)
+                my_output = open("tests/{}.my".format(sample)).readlines()
+                my_tokens = [token for line in my_output for token in line.split()]
+
+                exp_output = open("tests/{}.out".format(sample)).readlines()
+                exp_tokens = [token for line in exp_output for token in line.split()]
+
+                match = True
+                if len(my_output) != len(exp_output):
+                    match = False
+                else:
+                    for i in xrange(0, len(my_output)):
+                        if my_output[i] == exp_output[i]:
+                            continue
+                        try:
+                            my_val  = float( my_output[i])
+                            exp_val = float(exp_output[i])
+                            if abs(my_val - exp_val) / max(1, abs(exp_val)) > 1e-9:
+                                raise ValueError
+                        except ValueError:
+                            match = False
+                            break
+
+                if match:
+                    bold(sample + " passed (ignored whitespace, float tolerance 1e-9)")
+                else:
+                    warn(sample + " failed")
+                    failed.append(sample)
 
     if failed:
         print
