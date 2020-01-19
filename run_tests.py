@@ -53,15 +53,23 @@ def main():
         if run("./{} < tests/{}.in > tests/{}.my".format(fname, sample, sample)):
             err("Run-time error on " + sample)
 
-        my_file = open("tests/{}.my".format(sample), 'r')
-        out_file = open("tests/{}.out".format(sample), 'r')
-        my, out = my_file.read(), out_file.read()
-        my_file.close(), out_file.close()
-
         print "\nExpected output on {}:".format(sample)
-        print out
+        has_output = True
+        try:
+            out = open("tests/{}.out".format(sample), 'r').read()
+            print out
+        except IOError:
+            print "File \'tests/{}.out\' not found\n".format(sample)
+            has_output = False
+
+        my = open("tests/{}.my".format(sample), 'r').read()
         print "Your output on {}:".format(sample)
         print my
+
+        if not has_output:
+            bold(sample + " failed (missing \'tests/{}.out\')".format(sample))
+            failed.append(sample)
+            continue
 
         proc = subprocess.Popen("diff tests/{}.out tests/{}.my".format(sample, sample),\
                 shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -101,7 +109,7 @@ def main():
                 if match:
                     bold(sample + " passed (ignored whitespace, float tolerance 1e-9)")
                 else:
-                    warn(sample + " failed")
+                    bold(sample + " failed")
                     failed.append(sample)
 
     if failed:
