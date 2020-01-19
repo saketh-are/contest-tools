@@ -6,13 +6,22 @@ from os.path import isfile, join
 
 class colors:
     HEADER = '\033[95m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+
+    ENDC = '\033[0m'
+
+class icons:
+    PASS  = colors.GREEN + 'Y' + colors.ENDC
+    FAIL  = colors.RED + 'N' + colors.ENDC
+    MAYBE = colors.YELLOW + '?' + colors.ENDC
+
 def err(message):
-    print colors.BOLD + colors.FAIL + "ERROR" + colors.ENDC + ": " + message
+    print colors.BOLD + colors.RED + "ERROR" + colors.ENDC + ": " + message
     exit(1)
 
 def warn(message):
@@ -40,8 +49,9 @@ def main():
 
     sample_input = re.compile("sample.*[.]in")
     sample_files = [f[:-3] for f in listdir("tests/") if sample_input.match(f)]
-    failed = []
 
+    failed = []
+    summary = ""
     first_line_has_multiple_tokens = False
 
     bold("\nRunning samples...")
@@ -67,8 +77,9 @@ def main():
         print my
 
         if not has_output:
-            bold(sample + " failed (missing \'tests/{}.out\')".format(sample))
+            warn(sample + " failed (missing \'tests/{}.out\')".format(sample))
             failed.append(sample)
+            summary += icons.MAYBE
             continue
 
         proc = subprocess.Popen("diff tests/{}.out tests/{}.my".format(sample, sample),\
@@ -77,12 +88,14 @@ def main():
 
         if o.decode('ascii') == "":
             bold(sample + " passed")
+            summary += icons.PASS
         else:
             proc = subprocess.Popen("diff -b tests/{}.out tests/{}.my".format(sample, sample),\
                     shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             o,e = proc.communicate()
             if o.decode('ascii') == "":
                 bold(sample + " passed (ignored whitespace)")
+                summary += icons.PASS
             else:
                 my_output = open("tests/{}.my".format(sample)).readlines()
                 my_tokens = [token for line in my_output for token in line.split()]
@@ -108,19 +121,21 @@ def main():
 
                 if match:
                     bold(sample + " passed (ignored whitespace, float tolerance 1e-9)")
+                    summary += icons.PASS
                 else:
-                    bold(sample + " failed")
+                    warn(sample + " failed")
                     failed.append(sample)
+                    summary += icons.FAIL
 
     if failed:
         print
-        err("Failed samples " + str(failed))
+        print summary + ": FAILED samples " + str(failed)
     elif not sample_files:
         print
-        err("No sample inputs found in tests/")
+        warn("No sample inputs found in tests/")
     else:
         print
-        bold("ALL SAMPLES OK!")
+        print summary + colors.BOLD + ": ALL SAMPLES OK!" + colors.ENDC
 
     if first_line_has_multiple_tokens:
         warn("First line of input has multiple tokens. Check their order carefully.")
